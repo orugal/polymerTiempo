@@ -1,0 +1,92 @@
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../farez-current/farez-current.html">
+<link rel="import" href="../farez-forecast/farez-forecast.html">
+<dom-module id="farez-weather">
+	<style type="text/css">
+		:host{
+			width: 100%;
+			height:100%;
+			overflow: hidden;
+			display: block;
+			/*color:#fff;*/
+		}
+		iron-image{
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			background-color: lightgrey;
+		}
+	</style>
+	<template>
+		<iron-image sizing="cover" preload src="{{imageSrc}}">
+		<iron-ajax 
+			auto 
+			handle-as="json" 
+			url="http://api.openweathermap.org/data/2.5/weather?lat=5.2105159&lon=-74.800118&appid=5d93a0eb51a9fb76f0ebdd00dfae4b7c&units=metric&lang=sp" 
+			on-response="getCurrentData"></iron-ajax>
+		<iron-ajax 
+			auto 
+			handle-as="json" 
+			url="http://api.openweathermap.org/data/2.5/forecast/daily?lat=5.2105159&lon=-74.800118&appid=5d93a0eb51a9fb76f0ebdd00dfae4b7c&units=metric&lang=sp" 
+			on-response="getCurrentForecast"></iron-ajax>
+
+		<farez-current id="currentWeather"></farez-current>
+		<farez-forecast id="forecastEl"></farez-forecast>	
+	</template>
+</dom-module>
+<script type="text/javascript" src="moment.js"></script>
+<script>
+	Polymer({
+		is:'farez-weather',
+		properties:{
+			imagenSrc:String
+		},
+		ready:function()
+		{
+
+		},
+		getCurrentData:function(event)
+		{
+			//console.log(event.detail.response);
+			var response = event.detail.response;
+			//this.imageSrc = "img/"+response.weather[0].icon+"_bg.jpg";
+			this.imageSrc = "img/fondo.jpg";
+			var icono 		= "http://openweathermap.org/img/w/"+response.weather[0].icon+".png";
+
+			var current = this.$.currentWeather;
+			current.temp 	= Number(response.main.temp).toFixed(1)+" °C";
+			current.humedad = Number(response.main.humidity)+" %";
+			current.desc 	= response.weather[0].description;
+			current.icon 	= icono;
+			current.ciu 	= response.name;
+		},
+		getCurrentForecast:function(event)
+		{
+			//console.log(event.detail.response);
+			var response = event.detail.response;
+			var forecast  = this.$.forecastEl;//llamado del componente y sus elementos
+			//console.log(forecast);
+			var list     = response.list;
+			for (var i =0;i < list.length;i++) 
+			{
+				list[i].icon = "http://openweathermap.org/img/w/"+list[i].weather[0].icon+".png";
+				list[i].desc = this.capitalize(list[i].weather[0].description);
+
+				list[i].temp.max  = Number(list[i].temp.max.toFixed(1))+"°C";
+				list[i].temp.min  = Number(list[i].temp.min.toFixed(1))+"°C";
+				list[i].humedad   = Number(list[i].humidity)+"%";
+
+				var day = moment.unix(Number(list[i].dt));
+				day.locale("co")
+				//console.log(day.format("dddd[, ] DD/MM/YYYY"))
+				list[i].date = day.format("dddd[, ] DD");
+			}
+			forecast.list = list;
+		},
+		capitalize:function(s)
+		{
+			return s[0].toUpperCase() + s.slice(1);
+		}
+	});
+</script>

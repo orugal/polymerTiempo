@@ -1,0 +1,50 @@
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<dom-module id="farez-forecast">
+	<style type="text/css">
+		:host{
+			margin:0 auto;
+			margin-top:2%;
+			width: 90%;
+			height:90%;
+			position: absolute;
+			z-index: 2
+		}
+		iron-image{
+			width: 50px;
+			height: 30px
+		}
+		.ele{}
+	</style>
+	<template>
+		<template is="dom-repeat" items="{{list}}"><!--Como hacer un ciclo-->
+			<paper-card>
+			  	<div class="card-content">
+			  		<div class="cafe-header">
+			  			<iron-image sizing="cover" preload src="{{item.icon}}">
+			  			<h2>{{item.ciu}}</h2>
+			  		</div>
+			  		<p>
+			  			<span>{{item.desc}}</span><br>
+						<span>{{item.temp.max}}</span><br>
+						<span>{{item.temp.min}}</span><br>
+						<span>{{item.humedad}}</span><br>
+						<span>{{item.date}}</span><br>
+			  		</p>
+			  	</div>
+			</paper-card>
+		</template>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+		is:'farez-forecast',
+		properties:{
+			list:new Array()
+		},
+		ready:function()
+		{
+
+		}
+	});
+</script>
